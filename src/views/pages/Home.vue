@@ -36,7 +36,7 @@
 import Streak from '../../components/StreakCard.vue';
 import LevelProgressCard from '../../components/LevelProgressCard.vue';
 import db from '../../db';
-import { addBattlesWon, gainExp } from '../../db';
+import { addBattlesWon, gainExp, updateProgress } from '../../db';
 
 export default {
   components: { 
@@ -68,6 +68,7 @@ export default {
         const expGained = 20; // Award EXP for each battle
         const updatedHabit = await gainExp(expGained); // Gain EXP
         this.habit = updatedHabit; // Update local habit data
+        
       } catch (error) {
         console.error('Failed to handle battle button click:', error);
       }
@@ -80,14 +81,6 @@ export default {
     } catch (error) {
       console.error('Error fetching habit:', error);
     }
-  },
-  watch: {
-    'habit.xpLevel'(newLevel, oldLevel) {
-      if (newLevel > oldLevel) {
-        alert(`Congratulations! You leveled up to Level ${newLevel}!`);
-        // Optionally trigger animations, confetti, etc.
-      }
-    },
   },
 };
 </script>

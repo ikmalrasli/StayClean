@@ -5,7 +5,7 @@
     <Titlebar :title="pageTitles[currentPage]" @toggleTheme="toggleTheme" />
 
     <!-- Content -->
-    <main class="flex-grow p-4 overflow-y-auto relative">
+    <main class="flex-grow p-4 overflow-y-auto relative" style="scrollbar-width: none;">
       <component :is="currentPage" />
     </main>
 

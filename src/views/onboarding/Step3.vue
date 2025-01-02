@@ -51,14 +51,13 @@
 
 <script>
 import { setHabit } from '../../db';
-import { useRouter } from 'vue-router';
 
 export default {
   data() {
     const now = new Date();
     return {
       habitName: '',
-      habitColor: '#FF4B6C', // Default to pink/coral color
+      habitColor: '#3b82f6', // Default to pink/coral color
       selectedDate: now.toISOString().split('T')[0], // Current date
       selectedTime: now.toTimeString().slice(0, 5), // Current time (HH:mm)
     };
