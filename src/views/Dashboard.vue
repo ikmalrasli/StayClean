@@ -42,17 +42,6 @@ export default {
     navigate(page) {
       this.currentPage = page;
     },
-    toggleTheme() {
-      const html = document.documentElement;
-      const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
-
-      // Toggle theme classes
-      html.classList.remove('light', 'dark');
-      html.classList.add(newTheme);
-
-      // Save the theme in localStorage
-      localStorage.setItem('theme', newTheme);
-    },
   },
 };
 </script>
