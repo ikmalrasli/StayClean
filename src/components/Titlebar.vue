@@ -1,11 +1,11 @@
 <!-- src/components/Titlebar.vue -->
 <template>
-  <header class="w-full py-2 px-4 flex items-center justify-end relative">
+  <header class="w-full min-h-14 py-2 px-4 flex items-center relative">
     <h1 class="text-lg font-bold text-primary absolute left-1/2 transform -translate-x-1/2">
       {{ title }}
     </h1>
-    <button @click="$emit('toggleTheme')" class="text-primary hover-card rounded-full p-2">
-      🌙
+    <button v-if="title === 'Stats'" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-lg text-primary hover-card rounded-full">
+      <i class="fa-solid fa-clock-rotate-left"></i>
     </button>
   </header>
 </template>

@@ -13,6 +13,26 @@
       </div>
     </div>
     <div class="bg-card text-primary shadow-card rounded-2xl">
+      <div class="relative flex items-center justify-between px-6 py-4 rounded-2xl">
+        <div class="flex items-center space-x-4">
+          <div class="fa-solid fa-circle-half-stroke text-lg"></div>
+          <span>Theme</span>
+        </div>
+        <!-- Toggle Dark/Light -->
+        <div :class="isDark ? 'bg-blue-950' : 'bg-yellow-200'" @click="toggleTheme" class="w-14 transition-all duration-500 h-8 flex items-center rounded-full cursor-pointer">
+          <div :class="{ 
+            'translate-x-7': isDark, 
+            'bg-blue-400': isDark, 
+            'bg-yellow-400': !isDark 
+          }" 
+          class="w-7 h-7 transition-all duration-500 transform rounded-full shadow-md justify-center items-center flex">
+            <i v-if="isDark" class="text-xs text-white fa-solid fa-moon"></i>
+            <i v-else class="text-xs text-white fa-solid fa-sun"></i>
+          </div>
+        </div>
+        <!-- Divider Line -->
+        <div class="absolute bottom-0 left-12 right-0 h-px bg-secondary "></div>
+      </div>
       <div
         v-for="(item, index) in items1"
         :key="index"
@@ -48,7 +68,7 @@
         ></div>
       </div>
     </div>
-    <button class="w-full bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-2xl"
+    <button class="w-full bg-red-500 hover:bg-red-700 text-white font-medium p-4 rounded-2xl"
     @click="deleteBtn">Reset Habit</button>
   </div>
 </template>
@@ -61,6 +81,7 @@ export default {
   data() {
     return {
       habit: null,
+      isDark: null,
       items1: [
         {
           label: "Set Rewards",
@@ -88,6 +109,18 @@ export default {
     };
   },
   methods: {
+    toggleTheme() {
+      this.isDark = !this.isDark;
+      const html = document.documentElement;
+      const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
+
+      // Toggle theme classes
+      html.classList.remove('light', 'dark');
+      html.classList.add(newTheme);
+
+      // Save the theme in localStorage
+      localStorage.setItem('theme', newTheme);
+    },
     deleteBtn() {
       deleteHabit();
       this.$router.push('/onboarding/step1');
@@ -108,6 +141,8 @@ export default {
     try {
       const habit = await db.habit.get(1);
       this.habit = habit;
+      const html = document.documentElement;
+      this.isDark = html.classList.contains('dark');
     } catch (error) {
       console.error('Error fetching habit:', error);
     }
