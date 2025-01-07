@@ -29,12 +29,6 @@
       @click="gainExp">
       <i class="fa-solid fa-fist-raised"></i>
     </button>
-
-    <button
-      class="absolute bottom-0 left-4 bg-blue-500 hover:bg-blue-700 text-white h-16 w-16 rounded-full shadow-card"
-      @click="clearExp">
-      <i class="fa-solid fa-eraser"></i>
-    </button>
   </div>
 </template>
 
