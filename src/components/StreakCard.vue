@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       views: ['Hours', 'Days', 'Weeks', 'Months', 'Years'], // Available views
-      activeView: 'Hours', // Default view
+      activeView: '', // No default view initially
       currentTime: Date.now(), // To trigger updates
     };
   },
@@ -111,12 +111,51 @@ export default {
     this.interval = setInterval(() => {
       this.currentTime = Date.now();
     }, 1000);
+
+    // Set the default view based on the streak start date
+    this.setDefaultView();
   },
   beforeUnmount() {
     // Clear the interval when the component is destroyed
     if (this.interval) {
       clearInterval(this.interval);
     }
+  },
+  watch: {
+    // Watch for changes in streakStart and update activeView accordingly
+    streakStart() {
+      this.setDefaultView();
+    }
+  },
+  methods: {
+    setDefaultView() {
+      if (!this.streakStart) return;
+
+      const startDate = new Date(this.streakStart);
+      const now = new Date(this.currentTime); // Use the current time
+      const difference = Math.max(now - startDate, 0); // Difference in milliseconds
+
+      const seconds = Math.floor(difference / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const weeks = Math.floor(days / 7);
+      const months = Math.floor(days / 30.44); // Approximation
+      const years = Math.floor(days / 365.25); // Approximation
+
+      // Prioritize the view based on the first non-zero value
+      if (years > 0) {
+        this.activeView = 'Years';
+      } else if (months > 0) {
+        this.activeView = 'Months';
+      } else if (weeks > 0) {
+        this.activeView = 'Weeks';
+      } else if (days > 0) {
+        this.activeView = 'Days';
+      } else if (hours > 0) {
+        this.activeView = 'Hours';
+      }
+    },
   },
 };
 </script>
