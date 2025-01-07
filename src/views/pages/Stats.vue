@@ -57,6 +57,7 @@ import StreakCalendar from '../../components/CalendarCard.vue';
 import TrialCard from '../../components/TrialCard.vue';
 import NextMilestoneCard from '../../components/NextMilestoneCard.vue';
 import MiniStatsCard from '../../components/MiniStatsCard.vue';
+import db from '../../db';
 
 export default {
   components: {
@@ -69,18 +70,42 @@ export default {
     return {
       views: ['EXP Gained', 'Calendar', 'Reset Reasons'], // Available views
       activeView: 'Calendar', // Default view
-      activityData: [
-        { date: "2024-12-26", level: 4 },
-        { date: "2024-12-27", level: 1 },
-        { date: "2024-12-28", level: 3 },
-        { date: "2024-12-29", level: 2 },
-        { date: "2024-12-30", level: 3 },
-        { date: "2024-12-31", level: 4 },
-        { date: "2025-01-01", level: 4 },
-        { date: "2025-01-02", level: 1 },
-        // Continue for the rest of the month
-      ]
+      activityData: []
     };
+  },
+  methods: {
+    async fetchActivityData() {
+      const expRecords = await db.exp.toArray(); // Fetch all records from `exp` collection
+
+      // Group by date and calculate levels
+      const groupedData = expRecords.reduce((acc, record) => {
+        const date = new Date(record.time).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        if (!acc[date]) acc[date] = { date, totalExp: 0 };
+        acc[date].totalExp += record.exp; // Sum up EXP
+        return acc;
+      }, {});
+
+      // Convert to array and map totalExp to level
+      this.activityData = Object.values(groupedData).map(({ date, totalExp }) => ({
+        date,
+        level: this.mapExpToLevel(totalExp),
+      }));
+    },
+    mapExpToLevel(exp) {
+      if (exp > 200) return 4;
+      if (exp > 100) return 3;
+      if (exp > 50) return 2;
+      if (exp > 0) return 1;
+      return 0;
+    },
+  },
+  async created() {
+    try {
+      // Fetch activity data for Calendar
+      await this.fetchActivityData();
+    } catch (error) {
+      console.error('Error initializing Home.vue:', error);
+    }
   },
 };
 </script>
