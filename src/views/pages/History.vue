@@ -1,7 +1,14 @@
 <!-- src/views/History.vue -->
 <template>
   <div class="flex flex-col space-y-2">
-    <!-- Render TrialCard for each trial -->
+    <!-- Render Current Trial -->
+    <TrialCard
+    :dateStart="formatDate(habit?.dateStart)"
+    :streak="habit?.streak" 
+    :totalBattles="habit?.battles" 
+    :highestLevel="habit?.xpLevel" />
+
+    <!-- Render TrialCard for each past trial -->
     <TrialCard
       v-for="(trial, index) in trials"
       :key="index"
@@ -27,11 +34,13 @@ export default {
   data() {
     return {
       trials: [], // To store trials data
+      habit: null,
     };
   },
   methods: {
     async fetchTrials() {
       try {
+        this.habit = await db.habit.get(1);
         // Fetch all trials from the database
         this.trials = await db.trials.toArray();
         // Sort trials by trial number in descending order
@@ -43,7 +52,7 @@ export default {
     formatDate(date) {
       if (!date) return null;
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(date).toLocaleDateString(undefined, options); // Formats as "12 Dec 2024"
+      return new Date(date).toLocaleDateString("en-UK", options); // Formats as "12 Dec 2024"
     },
   },
   async created() {
