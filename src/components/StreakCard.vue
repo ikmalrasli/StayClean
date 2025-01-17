@@ -152,7 +152,7 @@ export default {
         this.activeView = 'Weeks';
       } else if (days > 0) {
         this.activeView = 'Days';
-      } else if (hours > 0) {
+      } else {
         this.activeView = 'Hours';
       }
     },
