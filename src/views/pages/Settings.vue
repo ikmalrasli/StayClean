@@ -1,3 +1,4 @@
+<!-- src/views/pages/Settings.vue -->
 <template>
   <div class="space-y-4">
     <div class="bg-card text-primary shadow-card rounded-2xl flex flex-row items-center px-6 py-4">
@@ -5,9 +6,14 @@
       <div class="flex-grow">
         <div class="flex items-center justify-between">
           <h1 class="text-left text-primary text-xl font-bold">{{ habit?.name }}</h1>
-          <button>
-            <i class="fa-solid fa-edit text-secondary"></i>
-          </button>
+          <div class="space-x-2">
+            <button>
+              <i class="fa-solid fa-edit text-secondary"></i>
+            </button>
+            <button>
+              <i class="fa-solid fa-trash text-secondary"></i>
+            </button>
+          </div>
         </div>
         <h2 class="text-left text-sm text-secondary">Started on {{ formattedStartDate(habit) }}</h2>
       </div>
@@ -36,7 +42,7 @@
       <div
         v-for="(item, index) in items1"
         :key="index"
-        class="relative flex items-center justify-between px-6 py-4 rounded-2xl hover:bg-secondary cursor-pointer"
+        class="relative flex items-center justify-between px-6 py-4 hover:bg-secondary cursor-pointer"
       >
         <div class="flex items-center space-x-4">
           <div :class="item.iconClass" class="text-lg"></div>
@@ -68,16 +74,19 @@
         ></div>
       </div>
     </div>
-    <button class="w-full bg-red-500 hover:bg-red-700 text-white font-medium p-4 rounded-2xl"
-    @click="deleteBtn">Reset Habit</button>
+    <resetButton/>
   </div>
 </template>
 
 <script>
 import db from '../../db';
-import { deleteHabit } from '../../db';
+import { resetHabit } from '../../db';
+import resetButton from '../../components/resetButton.vue'
 
 export default {
+  components:{
+    resetButton
+  },
   data() {
     return {
       habit: null,
@@ -120,10 +129,6 @@ export default {
 
       // Save the theme in localStorage
       localStorage.setItem('theme', newTheme);
-    },
-    deleteBtn() {
-      deleteHabit();
-      this.$router.push('/onboarding/step1');
     },
     formattedStartDate(habit) {
       if (habit?.dateStart) {
