@@ -27,22 +27,22 @@
     <div class="grid grid-cols-2 gap-2">
       <MiniStatsCard
       :title="'Best Streak'"
-      :value="28"  
+      :value="bestStreak"  
       :unit="'Days'"
       :icon="'fa-solid fa-fire'" />
       <MiniStatsCard
       :title="'Highest Level'"
-      :value="32"  
+      :value="highestLevel"  
       :unit="'Lv.'"
       :icon="'fa-solid fa-bolt'" />
       <MiniStatsCard
       :title="'Most Battles'"
-      :value="32"  
+      :value="mostBattles"  
       :unit="'Won'"
       :icon="'fa-solid fa-fist-raised'" />
       <MiniStatsCard
       :title="'Common Reset Reason'"
-      :reason="'Stress'" />
+      :reason="commonResetReason" />
     </div>
     <!-- <TrialCard
     :dateStart="'12 Dec 2024'" :dateEnd="'1 Dec 2024'" :streak="31" :totalBattles="28" :highestLevel="6" />
@@ -70,12 +70,24 @@ export default {
     return {
       views: ['EXP Gained', 'Calendar', 'Reset Reasons'], // Available views
       activeView: 'Calendar', // Default view
-      activityData: []
+      activityData: [],
+      bestStreak: 0,
+      highestLevel: 0,
+      mostBattles: 0,
+      commonResetReason: "-",
     };
   },
   methods: {
-    async fetchActivityData() {
+    async fetchActivityData() { 
       const expRecords = await db.exp.toArray(); // Fetch all records from `exp` collection
+      const trialRecords = await db.trials.toArray(); // Fetch all records from `trials` collection
+
+      // Create a set of dates where `dateEnded` exists
+      const datesWithEndedTrials = new Set(
+        trialRecords
+          .filter(trial => trial.dateEnded)
+          .map(trial => new Date(trial.dateEnded).toISOString().split('T')[0]) // Format as YYYY-MM-DD
+      );
 
       // Group by date and calculate levels
       const groupedData = expRecords.reduce((acc, record) => {
@@ -88,7 +100,9 @@ export default {
       // Convert to array and map totalExp to level
       this.activityData = Object.values(groupedData).map(({ date, totalExp }) => ({
         date,
-        level: this.mapExpToLevel(totalExp),
+        level: datesWithEndedTrials.has(date) 
+          ? 0 // If the date has `dateEnded`, level is 0
+          : this.mapExpToLevel(totalExp), // Otherwise, map EXP to level
       }));
     },
     mapExpToLevel(exp) {
@@ -98,11 +112,62 @@ export default {
       if (exp > 0) return 1;
       return 0;
     },
+    async fetchStats() {
+      try {
+        const trials = await db.trials.toArray(); // Fetch all past trials
+        const habit = await db.habit.get(1); // Fetch the current habit
+
+        if (!habit) {
+          console.error("No current habit found.");
+          return;
+        }
+
+        if (trials.length === 0) {
+          // No past trials, use current habit stats
+          this.bestStreak = habit.streak || 0;
+          this.highestLevel = habit.xpLevel || 0;
+          this.mostBattles = habit.battles || 0;
+          this.commonResetReason = "-";
+        } else {
+          // Compare current habit with past trials
+          const allTrials = [...trials, {
+            streak: habit.streak,
+            xpLevel: habit.xpLevel,
+            battles: habit.battles,
+            reason: "-",
+          }];
+          this.bestStreak = Math.max(...allTrials.map((t) => t.streak || 0));
+          this.highestLevel = Math.max(...allTrials.map((t) => t.xpLevel || 0));
+          this.mostBattles = Math.max(...allTrials.map((t) => t.battles || 0));
+
+          // Find the most common reset reason across all trials
+          const resetReasons = trials
+            .map((t) => t.reason)
+            .filter((reason) => reason && reason !== "-");
+          if (resetReasons.length > 0) {
+            this.commonResetReason = this.findMostCommon(resetReasons);
+          } else {
+            this.commonResetReason = "-";
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    },
+    findMostCommon(array) {
+      const frequency = array.reduce((acc, val) => {
+        acc[val] = (acc[val] || 0) + 1;
+        return acc;
+      }, {});
+      return Object.keys(frequency).reduce((a, b) =>
+        frequency[a] > frequency[b] ? a : b
+      );
+    },
   },
   async created() {
     try {
-      // Fetch activity data for Calendar
       await this.fetchActivityData();
+      await this.fetchStats();
     } catch (error) {
       console.error('Error initializing Home.vue:', error);
     }
