@@ -4,12 +4,12 @@
       
     <div class="flex flex-row items-center justify-center">
       <i v-if="icon" :class="icon" class="text-3xl text-primary mr-2"></i>
-      <p v-if="value" class="text-left text-primary text-3xl font-bold">
+      <p v-if="value!==null" class="text-left text-primary text-3xl font-bold">
         <span v-if="unit=='Lv.'" class="text-sm text-secondary font-normal">{{ unit }}</span>
         {{ value }}
         <span v-if="unit!='Lv.'" class="text-sm text-secondary font-normal">{{ unit }}</span>
       </p>
-      <p v-if="reason" class="text-secondary text-2xl font-bold">{{ reason }}</p>
+      <p v-if="reason!==null" class="text-secondary text-2xl font-bold">{{ reason }}</p>
     </div>
   </div>
 </template>
