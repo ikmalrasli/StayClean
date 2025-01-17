@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col h-dvh text-primary">
     <!-- Title Bar -->
-    <Titlebar :title="pageTitles[currentPage]" @toggleTheme="toggleTheme" />
+    <Titlebar :title="pageTitles[currentPage]" @navigate="navigate"/>
 
     <!-- Content -->
     <main class="flex-grow p-4 overflow-y-auto relative" style="scrollbar-width: none;">
@@ -42,11 +42,8 @@ export default {
     document.documentElement.classList.add(savedTheme);
 
     // Listen for navigate events from EventBus
-    EventBus.on('navigateHistory', () => {
-      this.currentPage = 'history';
-    });
-    EventBus.on('navigateStats', () => {
-      this.currentPage = 'stats';
+    EventBus.on('navigateHome', () => {
+      this.currentPage = 'home';
     });
   },
   methods: {
