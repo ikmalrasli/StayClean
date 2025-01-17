@@ -17,12 +17,12 @@
           <input 
             type="date"
             v-model="selectedDate"
-            class="w-32 px-3 py-1 rounded-lg focus:outline-none cursor-pointer"
+            class="w-36 px-3 py-1 rounded-lg bg-secondary text-primary focus:outline-none cursor-pointer"
           />
           <input 
             type="time"
             v-model="selectedTime"
-            class="px-3 py-1 rounded-lg focus:outline-none cursor-pointer"
+            class="px-3 py-1 rounded-lg bg-secondary text-primary focus:outline-none cursor-pointer"
           />
         </div>
       </div>
