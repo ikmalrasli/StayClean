@@ -70,6 +70,15 @@ export default {
         if (!habit || !habit.dateStart) return;
 
         const now = Date.now();
+        const lastResetDate = new Date(habit.lastResetDate).toDateString(); // Get reset date as a string
+        const today = new Date().toDateString();
+
+        // If today matches the reset day, skip EXP processing
+        if (lastResetDate && today === lastResetDate) {
+          console.warn("EXP gain is disabled on the reset day.");
+          return;
+        }
+
         const nextExpGainTime = habit.nextExpGainTime
           ? new Date(habit.nextExpGainTime).getTime()
           : new Date(habit.dateStart).getTime() + 24 * 60 * 60 * 1000;
@@ -81,7 +90,8 @@ export default {
         }
 
         if (daysGained > 0) {
-          const expGained = 30 * daysGained; // Gain 30 EXP per day
+          const expPerDay = 50;
+          const expGained = expPerDay * daysGained;
           habit.currentExp += expGained;
           habit.streak += daysGained;
           habit.nextExpGainTime = nextExpGainTime + daysGained * 24 * 60 * 60 * 1000;
@@ -99,15 +109,15 @@ export default {
           for (let i = 0; i < daysGained; i++) {
             await db.exp.add({
               time: nextExpGainTime + i * 24 * 60 * 60 * 1000,
-              exp: 50,
-              type: 'streak',
+              exp: expPerDay,
+              type: "streak",
             });
           }
           console.log(`EXP gained: ${expGained} for ${daysGained} days.`);
           alert(`EXP gained: ${expGained} for ${daysGained} days.`);
         }
       } catch (error) {
-        console.error('Failed to process daily EXP:', error);
+        console.error("Failed to process daily EXP:", error);
       }
     },
     async gainExp() {
@@ -115,6 +125,15 @@ export default {
       try {
         const habit = await db.habit.get(1);
         if (!habit) return;
+
+        const lastResetDate = new Date(habit.lastResetDate).toDateString(); // Get reset date as a string
+        const today = new Date().toDateString();
+
+        // If today matches the reset day, skip EXP gain
+        if (lastResetDate && today === lastResetDate) {
+          console.warn("EXP gain is disabled on the reset day.");
+          return;
+        }
 
         habit.currentExp += expGained;
         habit.battles++;
@@ -128,26 +147,19 @@ export default {
 
         await db.habit.put(habit);
         this.habit = habit;
-        await db.exp.add({ 
-          time: Date.now(), 
+        await db.exp.add({
+          time: Date.now(),
           exp: expGained,
-          type: 'battle'
+          type: "battle",
         });
-        console.log('Habit:', habit, 'expRecords:', await db.exp.toArray());
+        console.log("Habit:", habit, "expRecords:", await db.exp.toArray());
         return habit; // Return updated habit
       } catch (error) {
-        console.error('Failed to gain EXP:', error);
+        console.error("Failed to gain EXP:", error);
       }
     },
     async clearExp(){
-      await db.habit.update(1, {
-        battles: 0,
-        currentExp: 0,
-        xpLevel: 1,
-        maxExp: this.EXP_THRESHOLD(1),
-      });
       await db.exp.clear();
-      this.habit = await db.habit.get(1);
     }
   },
   async created() {
