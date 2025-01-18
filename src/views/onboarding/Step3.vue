@@ -11,7 +11,7 @@
         />
       </div>
 
-      <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
         <span class="text-gray-400">Started on</span>
         <div class="flex space-x-2">
           <input 
@@ -113,12 +113,5 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 input[type="color"]::-webkit-color-swatch {
   border: none;
   border-radius: 50%;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0;
-  cursor: pointer;
 }
 </style>
