@@ -37,6 +37,7 @@ export async function deleteHabit() {
   try {
     await db.habit.delete(1);
     await db.exp.clear();
+    await db.trials.clear();
     console.log('Habit deleted successfully!');
   } catch (error) {
     console.error('Failed to delete habit:', error);
