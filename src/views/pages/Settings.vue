@@ -6,22 +6,19 @@
       <div class="flex-grow">
         <div class="flex items-center justify-between">
           <h1 class="text-left text-primary text-xl font-bold">{{ habit?.name }}</h1>
-          <div class="space-x-2">
-            <button>
-              <i class="fa-solid fa-edit text-secondary"></i>
-            </button>
-            <button>
-              <i class="fa-solid fa-trash text-secondary"></i>
-            </button>
+          <div class="flex space-x-2">
+            <editButton />
+            <deleteButton />
           </div>
         </div>
         <h2 class="text-left text-sm text-secondary">Started on {{ formattedStartDate(habit) }}</h2>
       </div>
     </div>
     <div class="bg-card text-primary shadow-card rounded-2xl">
-      <div class="relative flex items-center justify-between px-6 py-4 rounded-2xl">
+      <div class="relative flex items-center justify-between px-6 py-4 rounded-t-2xl hover:bg-secondary cursor-pointer"
+      @click="toggleTheme">
         <div class="flex items-center space-x-4">
-          <div class="fa-solid fa-circle-half-stroke text-lg"></div>
+          <i class="fa-solid fa-circle-half-stroke text-lg"></i>
           <span>Theme</span>
         </div>
         <!-- Toggle Dark/Light -->
@@ -43,6 +40,7 @@
         v-for="(item, index) in items1"
         :key="index"
         class="relative flex items-center justify-between px-6 py-4 hover:bg-secondary cursor-pointer"
+        :class="[index === items1.length - 1 ? 'rounded-b-2xl' : '']"
       >
         <div class="flex items-center space-x-4">
           <div :class="item.iconClass" class="text-lg"></div>
@@ -60,7 +58,8 @@
       <div
         v-for="(item, index) in items2"
         :key="index"
-        class="relative flex items-center justify-between px-6 py-4 rounded-2xl hover:bg-secondary cursor-pointer"
+        class="relative flex items-center justify-between px-6 py-4 hover:bg-secondary cursor-pointer"
+        :class="[index === 0 ? 'rounded-t-2xl' : '', index === items2.length - 1 ? 'rounded-b-2xl' : '']"
       >
         <div class="flex items-center space-x-4">
           <div :class="item.iconClass" class="text-lg"></div>
@@ -80,12 +79,15 @@
 
 <script>
 import db from '../../db';
-import { resetHabit } from '../../db';
 import resetButton from '../../components/resetButton.vue'
+import editButton from '../../components/editButton.vue'
+import deleteButton from '../../components/deleteButton.vue'
 
 export default {
   components:{
-    resetButton
+    resetButton,
+    editButton,
+    deleteButton
   },
   data() {
     return {
